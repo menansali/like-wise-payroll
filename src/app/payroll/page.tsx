@@ -31,6 +31,15 @@ export default function PayrollLandingPage() {
 
         <NotificationBanner message="Payroll due in 7 days for your team" />
 
+        <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-emerald-100">
+            Smart budget
+          </p>
+          <p className="mt-2 text-lg font-semibold text-white">
+            Save 2% more. Convert USD → INR now.
+          </p>
+        </section>
+
         <div className="grid gap-4 md:grid-cols-3">
           <Stat label="Workers in scope" value={derived.workerCount || '—'} />
           <Stat label="Countries covered" value={derived.countryCount || '—'} />

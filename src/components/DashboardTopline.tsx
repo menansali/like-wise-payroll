@@ -66,17 +66,17 @@ export default function DashboardTopline() {
           Includes 12 countries / 3 currencies.
         </p>
       </Card>
-      <Card variant="dark">
-        <p className="text-xs uppercase tracking-wide text-slate-200">
+      <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
+        <p className="text-xs uppercase tracking-wide text-emerald-100">
           {data.smartAlert.title}
         </p>
         <p className="mt-2 text-lg font-semibold text-white">
           {data.smartAlert.message}
         </p>
-        <p className="text-sm text-slate-200">
+        <p className="text-sm text-emerald-100">
           Save approximately {data.smartAlert.savingsPercent}% vs. last FX trade.
         </p>
-      </Card>
+      </section>
     </div>
   );
 }

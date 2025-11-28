@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Wise WorkHub',
-  description: 'Admin dashboard for orchestrating global payroll runs',
+  title: 'Wise',
+  description: 'Global payroll orchestration and treasury management',
 };
 
 export default function RootLayout({

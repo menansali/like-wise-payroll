@@ -1,6 +1,6 @@
-# Wise WorkHub
+# Wise - Global Payroll Orchestration Platform
 
-Wise WorkHub is a minimal admin dashboard that simulates global payroll orchestration. It is built with Next.js App Router, TypeScript, and Tailwind CSS so you can quickly plug in real data sources or redesign the UI from Figma later on.
+A comprehensive admin dashboard for global payroll orchestration and treasury management. Built with Next.js 16, TypeScript, and Tailwind CSS. Features end-to-end payroll processing, smart FX rate locking, multi-currency support, and team management.
 
 ## Getting started
 
@@ -9,14 +9,24 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` to use the fake login screen and follow the flow:
+Open `http://localhost:3000` to start the demo (redirects directly to dashboard):
 
-- `/` – Landing/Login (click **Enter dashboard**)
-- `/dashboard` – Workforce snapshot + payroll health
-- `/payroll` – Current payroll run overview
-- `/payroll/upload` – CSV upload, validation, and results
-- `/payroll/summary` – Payment summary (FX, fees, settlement)
-- `/payroll/confirmation` – Confirmation after executing payroll
+**Main Routes:**
+- `/` – Redirects to `/dashboard`
+- `/dashboard` – Workforce snapshot, payroll health, smart alerts
+- `/payroll` – Current payroll run overview with green alert
+- `/payroll/upload` – CSV upload with "Use demo file" option
+- `/payroll/summary` – Payment summary with FX planner (3 options)
+- `/payroll/confirmation` – Execution confirmation
+- `/smart-budget` – Budget planning, FX rate locking, schedule table
+- `/team` – Team member management
+
+**Quick Demo Flow:**
+1. Root (`/`) → Auto-redirects to Dashboard
+2. Dashboard → "Start payroll run" 
+3. Upload → "Use demo file"
+4. Summary → Select FX option → Execute
+5. Confirmation → See results
 
 ## Project structure
 
