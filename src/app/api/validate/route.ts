@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { validateRows } from '@/lib/validation';
+import { validateRows, getValidationStats } from '@/lib/validation';
 import type { PayrollRow } from '@/lib/types';
 
 export async function POST(request: Request) {
@@ -12,7 +12,24 @@ export async function POST(request: Request) {
     );
   }
 
+  if (body.rows.length === 0) {
+    return NextResponse.json(
+      { message: 'No rows to validate' },
+      { status: 400 },
+    );
+  }
+
+  // Simulate processing delay based on row count
+  const delay = Math.min(50 + body.rows.length * 10, 500);
+  await new Promise((resolve) => setTimeout(resolve, delay));
+
   const result = validateRows(body.rows);
-  return NextResponse.json(result);
+  const stats = getValidationStats(result);
+
+  return NextResponse.json({
+    ...result,
+    stats,
+    processedAt: new Date().toISOString(),
+  });
 }
 

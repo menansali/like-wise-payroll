@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type {
   ExecutionResult,
   PayrollRow,
@@ -15,6 +15,7 @@ type PayrunContextValue = {
   setValidationResult: (rows: PayrollRow[], result: ValidationResult) => void;
   setExecutionResult: (result: ExecutionResult) => void;
   reset: () => void;
+  isHydrated: boolean;
   derived: {
     workerCount: number;
     countryCount: number;
@@ -22,8 +23,42 @@ type PayrunContextValue = {
 };
 
 const DEFAULT_PERIOD = 'Nov 1–30, 2025';
+const STORAGE_KEY = 'wiseworkhub_payrun';
 
 const PayrunContext = createContext<PayrunContextValue | undefined>(undefined);
+
+// Helper to safely access localStorage
+function getStoredData() {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveToStorage(data: {
+  rows: PayrollRow[];
+  validationResult: ValidationResult | null;
+  executionResult: ExecutionResult | null;
+}) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {
+    // Storage full or unavailable
+  }
+}
+
+function clearStorage() {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore errors
+  }
+}
 
 export function PayrunProvider({
   children,
@@ -36,6 +71,25 @@ export function PayrunProvider({
   );
   const [executionResult, setExecutionResult] =
     useState<ExecutionResult | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Hydrate from localStorage on mount
+  useEffect(() => {
+    const stored = getStoredData();
+    if (stored) {
+      setRows(stored.rows || []);
+      setValidation(stored.validationResult || null);
+      setExecutionResult(stored.executionResult || null);
+    }
+    setIsHydrated(true);
+  }, []);
+
+  // Persist to localStorage on changes
+  useEffect(() => {
+    if (isHydrated) {
+      saveToStorage({ rows, validationResult, executionResult });
+    }
+  }, [rows, validationResult, executionResult, isHydrated]);
 
   const derived = useMemo(() => {
     const countryCount = new Set(rows.map((row) => row.country)).size;
@@ -49,6 +103,7 @@ export function PayrunProvider({
     setRows([]);
     setValidation(null);
     setExecutionResult(null);
+    clearStorage();
   };
 
   const value: PayrunContextValue = {
@@ -63,6 +118,7 @@ export function PayrunProvider({
     },
     setExecutionResult,
     reset,
+    isHydrated,
     derived,
   };
 

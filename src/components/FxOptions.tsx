@@ -6,10 +6,16 @@ import type { FxPlan } from '@/lib/types';
 
 type Props = {
   plan?: FxPlan;
+  onSelect?: (optionId: string) => void;
 };
 
-export default function FxOptions({ plan }: Props) {
-  const [selected, setSelected] = useState<string | null>(null);
+export default function FxOptions({ plan, onSelect }: Props) {
+  const [selected, setSelected] = useState<string | null>('convert-now');
+
+  const handleSelect = (optionId: string) => {
+    setSelected(optionId);
+    onSelect?.(optionId);
+  };
 
   if (!plan) {
     return null;
@@ -40,7 +46,7 @@ export default function FxOptions({ plan }: Props) {
             <button
               key={option.id}
               type="button"
-              onClick={() => setSelected(option.id)}
+              onClick={() => handleSelect(option.id)}
               className={`rounded-xl border p-4 text-left transition ${
                 isActive
                   ? 'border-slate-900 bg-slate-900 text-white'

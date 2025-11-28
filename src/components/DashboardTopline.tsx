@@ -1,10 +1,47 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
 import { dashboardTopline } from '@/lib/mockData';
 import type { DashboardTopline as DashboardToplineType } from '@/lib/types';
 
-const data: DashboardToplineType = dashboardTopline;
-
 export default function DashboardTopline() {
+  const [data, setData] = useState<DashboardToplineType>(dashboardTopline);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/dashboard');
+        if (response.ok) {
+          const result = await response.json();
+          setData(result.topline);
+        }
+      } catch {
+        // Use fallback data on error
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 lg:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <div className="animate-pulse space-y-3">
+              <div className="h-3 w-24 rounded bg-slate-200" />
+              <div className="h-8 w-32 rounded bg-slate-200" />
+              <div className="h-3 w-40 rounded bg-slate-200" />
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid gap-4 lg:grid-cols-3">
       <Card>
