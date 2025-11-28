@@ -1,20 +1,31 @@
-import Link from 'next/link';
+'use client';
+
+import { LayoutDashboard, Users, Wallet, Workflow } from 'lucide-react';
+import SideNav, { type NavLink } from '@/components/navigation/SideNav';
+import TopBar from '@/components/navigation/TopBar';
+
+const NAV_LINKS: NavLink[] = [
+  { label: 'Home', href: '/dashboard', icon: <LayoutDashboard size={16} /> },
+  { label: 'Cards', href: '/cards', icon: <Wallet size={16} /> },
+  { label: 'Transactions', href: '/transactions', icon: <Workflow size={16} /> },
+  { label: 'Payments', href: '/payments', icon: <Workflow size={16} /> },
+  { label: 'Payroll', href: '/payroll', icon: <Workflow size={16} /> },
+  { label: 'Smart budget', href: '/smart-budget', icon: <Wallet size={16} /> },
+  { label: 'Team', href: '/team', icon: <Users size={16} /> },
+  { label: 'Recipients', href: '/recipients', icon: <Users size={16} /> },
+  { label: 'Insights', href: '/insights', icon: <LayoutDashboard size={16} /> },
+];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-lg font-semibold">
-            Wise WorkHub
-          </Link>
-          <div className="text-right text-sm text-slate-500">
-            <p className="font-medium text-slate-700">Alex Morgan</p>
-            <p>Global Payroll Admin</p>
-          </div>
+    <div className="min-h-screen bg-slate-100/70 text-slate-900">
+      <div className="flex min-h-screen">
+        <SideNav links={NAV_LINKS} />
+        <div className="flex flex-1 flex-col">
+          <TopBar />
+          <main className="flex-1 px-4 py-6 lg:px-8">{children}</main>
         </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+      </div>
     </div>
   );
 }

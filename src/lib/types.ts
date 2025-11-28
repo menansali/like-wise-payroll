@@ -42,6 +42,7 @@ export type PaymentSummary = {
 export type ExecutionResult = {
   successCount: number;
   failedCount: number;
+  fxDecision?: string;
 };
 
 export type DashboardTopline = {
@@ -80,5 +81,108 @@ export type FxPlan = {
   amountInTarget: number;
   indicativeRate: number;
   options: FxOption[];
+};
+
+export type CurrencyNeed = {
+  id: string;
+  country: string;
+  flag: string;
+  currencyLabel: string;
+  requiredAmount: number;
+  bufferAmount: number;
+  message?: string;
+  status: 'open' | 'running-low' | 'surplus';
+};
+
+export type DashboardEmployeeRow = {
+  id: string;
+  name: string;
+  country: string;
+  countryFlag: string;
+  paymentCurrency: string;
+  amountLocal: string;
+  amountSource: string;
+  note: string;
+  tag?: string;
+};
+
+export type PayrollRunRow = {
+  id: string;
+  employee: string;
+  country: string;
+  contractType: string;
+  paymentCurrency: string;
+  paymentDate: string;
+  amountLocal: string;
+  amountSource: string;
+  note: string;
+};
+
+export type EmployeeDocument = {
+  label: string;
+  value: string;
+};
+
+export type EmployeeRecord = {
+  id: string;
+  name: string;
+  role: string;
+  avatarInitials: string;
+  country: string;
+  status: string;
+  startDate: string;
+  nextPayrollDate: string;
+  payroll: {
+    salary: string;
+    salaryInSource: string;
+    paymentCurrency: string;
+    payoutMethod: string;
+  };
+  compliance: {
+    taxId: string;
+    country: string;
+    contractFile: string;
+  };
+  leave: {
+    summary: string;
+    note: string;
+  };
+  transactions: Array<{
+    id: string;
+    description: string;
+    date: string;
+    amountLocal: string;
+    amountSource: string;
+  }>;
+};
+
+export type SmartBudgetOverview = {
+  headline: string;
+  description: string;
+  cards: Array<{
+    id: string;
+    label: string;
+    amount: string;
+    subtext: string;
+    icons?: string[];
+  }>;
+};
+
+export type SmartBudgetScheduleRow = {
+  id: string;
+  currency: string;
+  country: string;
+  flag: string;
+  change1m: string;
+  change3m: string;
+  change6m: string;
+  employees: number;
+  payout: string;
+  actionNotes: string;
+};
+
+export type CategoryFilter = {
+  id: string;
+  label: string;
 };
 

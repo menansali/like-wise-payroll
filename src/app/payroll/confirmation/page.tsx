@@ -58,6 +58,17 @@ export default function ConfirmationPage() {
               value={executionResult.failedCount}
             />
           </div>
+          {executionResult.fxDecision && (
+            <div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-700">
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                FX decision
+              </p>
+              <p className="mt-1 font-semibold">
+                {friendlyFxDecision(executionResult.fxDecision)}
+              </p>
+
+            </div>
+          )}
         </Card>
 
         <button
@@ -79,5 +90,18 @@ function ResultStat({ label, value }: { label: string; value: number }) {
       <p className="text-3xl font-semibold text-slate-900">{value}</p>
     </div>
   );
+}
+
+function friendlyFxDecision(id: string): string {
+  switch (id) {
+    case 'convert-now':
+      return 'Convert now – funds were converted immediately before payouts.';
+    case 'schedule-payday':
+      return 'Schedule conversion – FX will be executed automatically on payroll cut-off.';
+    case 'lock-rate':
+      return 'Lock rate – today’s FX rate is held while approvals complete.';
+    default:
+      return id;
+  }
 }
 
