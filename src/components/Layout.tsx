@@ -1,15 +1,22 @@
 'use client';
 
-import { LayoutDashboard, Users, Wallet, Workflow } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  Briefcase,
+  LayoutDashboard,
+  Send,
+  Users,
+  Wallet,
+} from 'lucide-react';
 import SideNav, { type NavLink } from '@/components/navigation/SideNav';
 import TopBar from '@/components/navigation/TopBar';
 
 const NAV_LINKS: NavLink[] = [
   { label: 'Home', href: '/dashboard', icon: <LayoutDashboard size={16} /> },
   { label: 'Cards', href: '/cards', icon: <Wallet size={16} /> },
-  { label: 'Transactions', href: '/transactions', icon: <Workflow size={16} /> },
-  { label: 'Payments', href: '/payments', icon: <Workflow size={16} /> },
-  { label: 'Payroll', href: '/payroll', icon: <Workflow size={16} /> },
+  { label: 'Transactions', href: '/transactions', icon: <ArrowLeftRight size={16} /> },
+  { label: 'Payments', href: '/payments', icon: <Send size={16} /> },
+  { label: 'Payroll', href: '/payroll', icon: <Briefcase size={16} /> },
   { label: 'Smart budget', href: '/smart-budget', icon: <Wallet size={16} /> },
   { label: 'Team', href: '/team', icon: <Users size={16} /> },
   { label: 'Recipients', href: '/recipients', icon: <Users size={16} /> },

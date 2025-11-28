@@ -9,9 +9,9 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` to use the fake login screen and follow the flow:
+Open `http://localhost:3000` to start. The root route redirects to the dashboard:
 
-- `/` – Landing/Login (click **Enter dashboard**)
+- `/` – Redirects to `/dashboard`
 - `/dashboard` – Workforce snapshot + payroll health
 - `/payroll` – Current payroll run overview
 - `/payroll/upload` – CSV upload, validation, and results

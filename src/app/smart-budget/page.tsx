@@ -41,6 +41,18 @@ export default function SmartBudgetPage() {
 
         <OverviewCards overview={smartBudgetOverview} />
 
+        <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-emerald-100">
+            Converting alert
+          </p>
+          <p className="mt-2 text-lg font-semibold text-white">
+            Save 2% more. Convert USD → INR now.
+          </p>
+          <p className="text-sm text-emerald-100">
+            Lock today's rate to maximize savings on your next payroll run.
+          </p>
+        </section>
+
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-3xl border border-slate-200 bg-white/80 p-6">
             <h2 className="text-lg font-semibold text-slate-900">
