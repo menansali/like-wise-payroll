@@ -1,18 +1,81 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
 import PaymentSummaryCard from '@/components/PaymentSummaryCard';
 import FxOptions from '@/components/FxOptions';
 import { usePayrun } from '@/context/PayrunContext';
 import { buildPaymentSummary } from '@/lib/summary';
+import type { PaymentSummary } from '@/lib/types';
 
 export default function PaymentSummaryPage() {
   const router = useRouter();
-  const { validationResult, setExecutionResult } = usePayrun();
-  const approvedRows = validationResult?.valid ?? [];
-  const warningRows = validationResult?.warnings ?? [];
-  const summary = buildPaymentSummary([...approvedRows, ...warningRows]);
+  const { validationResult, setExecutionResult, fxChoice } = usePayrun();
+  const approvedRows = useMemo(
+    () => validationResult?.valid ?? [],
+    [validationResult?.valid],
+  );
+  const warningRows = useMemo(
+    () => validationResult?.warnings ?? [],
+    [validationResult?.warnings],
+  );
+  const [summary, setSummary] = useState<PaymentSummary | null>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const rowsForSummary = [...approvedRows, ...warningRows];
+
+    if (rowsForSummary.length === 0) {
+      setSummary(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadSummary = async () => {
+      setLoadingSummary(true);
+      setSummaryError(null);
+
+      try {
+        const response = await fetch('/api/fx-summary', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ rows: rowsForSummary }),
+        });
+
+        if (!response.ok) {
+          throw new Error('FX summary API failed');
+        }
+
+        const payload = (await response.json()) as PaymentSummary;
+        if (!cancelled) {
+          setSummary(payload);
+        }
+      } catch (error) {
+        // Fallback: rebuild summary on the client using demo FX rates.
+        if (!cancelled) {
+          setSummary(buildPaymentSummary(rowsForSummary));
+          setSummaryError(
+            error instanceof Error ? error.message : 'Falling back to demo FX data.',
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingSummary(false);
+        }
+      }
+    };
+
+    void loadSummary();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [approvedRows, warningRows]);
 
   if (!validationResult) {
     return (
@@ -35,6 +98,7 @@ export default function PaymentSummaryPage() {
     setExecutionResult({
       successCount: approvedRows.length,
       failedCount: warningRows.length,
+      fxDecision: fxChoice ?? undefined,
     });
     router.push('/payroll/confirmation');
   };
@@ -53,18 +117,34 @@ export default function PaymentSummaryPage() {
             FX totals, estimated fees, and settlement times derived from the last
             validated file. Choose how to fund this payroll before executing.
           </p>
+          {summaryError && (
+            <p className="mt-1 text-xs text-amber-700">
+              {summaryError} Using fallback FX rates for this demo.
+            </p>
+          )}
         </div>
 
-        <PaymentSummaryCard summary={summary} />
-        <FxOptions plan={summary.fxPlan} />
+        {summary ? (
+          <>
+            <PaymentSummaryCard summary={summary} />
+            <FxOptions plan={summary.fxPlan} />
+          </>
+        ) : (
+          <p className="text-sm text-slate-500">
+            {loadingSummary
+              ? 'Loading FX summary…'
+              : 'No rows available for FX summary.'}
+          </p>
+        )}
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
             onClick={executePayroll}
-            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+            disabled={!fxChoice}
+            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Execute payroll
+            {fxChoice ? 'Execute payroll' : 'Choose FX option to execute'}
           </button>
           <button
             type="button"

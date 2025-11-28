@@ -1,15 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '@/components/Card';
 import type { FxPlan } from '@/lib/types';
+import { usePayrun } from '@/context/PayrunContext';
 
 type Props = {
   plan?: FxPlan;
 };
 
 export default function FxOptions({ plan }: Props) {
-  const [selected, setSelected] = useState<string | null>(null);
+  const { fxChoice, setFxChoice } = usePayrun();
+  const [selected, setSelected] = useState<string | null>(fxChoice);
+
+  useEffect(() => {
+    setSelected(fxChoice);
+  }, [fxChoice]);
 
   if (!plan) {
     return null;
@@ -40,7 +46,10 @@ export default function FxOptions({ plan }: Props) {
             <button
               key={option.id}
               type="button"
-              onClick={() => setSelected(option.id)}
+              onClick={() => {
+                setSelected(option.id);
+                setFxChoice(option.id);
+              }}
               className={`rounded-xl border p-4 text-left transition ${
                 isActive
                   ? 'border-slate-900 bg-slate-900 text-white'

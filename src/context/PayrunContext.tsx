@@ -12,8 +12,10 @@ type PayrunContextValue = {
   rows: PayrollRow[];
   validationResult: ValidationResult | null;
   executionResult: ExecutionResult | null;
+  fxChoice: string | null;
   setValidationResult: (rows: PayrollRow[], result: ValidationResult) => void;
   setExecutionResult: (result: ExecutionResult) => void;
+  setFxChoice: (id: string | null) => void;
   reset: () => void;
   derived: {
     workerCount: number;
@@ -36,6 +38,7 @@ export function PayrunProvider({
   );
   const [executionResult, setExecutionResult] =
     useState<ExecutionResult | null>(null);
+  const [fxChoice, setFxChoice] = useState<string | null>(null);
 
   const derived = useMemo(() => {
     const countryCount = new Set(rows.map((row) => row.country)).size;
@@ -49,6 +52,7 @@ export function PayrunProvider({
     setRows([]);
     setValidation(null);
     setExecutionResult(null);
+    setFxChoice(null);
   };
 
   const value: PayrunContextValue = {
@@ -56,12 +60,15 @@ export function PayrunProvider({
     rows,
     validationResult,
     executionResult,
+    fxChoice,
     setValidationResult: (nextRows, result) => {
       setRows(nextRows);
       setValidation(result);
       setExecutionResult(null);
+      setFxChoice(null);
     },
     setExecutionResult,
+    setFxChoice,
     reset,
     derived,
   };

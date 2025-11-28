@@ -1,18 +1,14 @@
 import { settlementTimes } from '@/lib/mockData';
+import type { FxRateMap } from '@/lib/fx';
+import { getFallbackFxRates } from '@/lib/fx';
 import type { FxOption, FxPlan, PaymentSummary, PayrollRow } from '@/lib/types';
-
-const FX_TO_USD: Record<string, number> = {
-  USD: 1,
-  EUR: 1.08,
-  GBP: 1.27,
-  INR: 0.012,
-  BRL: 0.19,
-  SGD: 0.74,
-};
 
 const BASE_CURRENCY = 'USD';
 
-export function buildPaymentSummary(rows: PayrollRow[]): PaymentSummary {
+export function buildPaymentSummary(
+  rows: PayrollRow[],
+  fxRates: FxRateMap = getFallbackFxRates(),
+): PaymentSummary {
   const totalsByCurrency = rows.reduce<Record<string, number>>(
     (acc, row) => ({
       ...acc,
@@ -37,7 +33,7 @@ export function buildPaymentSummary(rows: PayrollRow[]): PaymentSummary {
     ([currency, amount]) => ({
       currency,
       amount,
-      amountInBase: amount * (FX_TO_USD[currency] ?? 1),
+      amountInBase: amount * (fxRates[currency] ?? 1),
     }),
   );
 
@@ -53,7 +49,7 @@ export function buildPaymentSummary(rows: PayrollRow[]): PaymentSummary {
     eta: settlementTimes[item.currency] ?? 'Within 2 business days',
   }));
 
-  const fxPlan = buildFxPlan(totalsByCurrencyArray);
+  const fxPlan = buildFxPlan(totalsByCurrencyArray, fxRates);
 
   return {
     totalWorkers: rows.length,
@@ -75,6 +71,7 @@ export function buildPaymentSummary(rows: PayrollRow[]): PaymentSummary {
 
 function buildFxPlan(
   totalsByCurrency: Array<{ currency: string; amount: number; amountInBase: number }>,
+  fxRates: FxRateMap,
 ): FxPlan | undefined {
   const target = totalsByCurrency.find((item) => item.currency !== BASE_CURRENCY);
 
@@ -83,7 +80,9 @@ function buildFxPlan(
   }
 
   const indicativeRate =
-    target.amount > 0 ? target.amountInBase / target.amount : FX_TO_USD[target.currency] ?? 1;
+    target.amount > 0
+      ? target.amountInBase / target.amount
+      : fxRates[target.currency] ?? 1;
 
   const options: FxOption[] = [
     {
