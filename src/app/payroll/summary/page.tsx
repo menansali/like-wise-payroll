@@ -10,9 +10,8 @@ import { buildPaymentSummary } from '@/lib/summary';
 
 export default function PaymentSummaryPage() {
   const router = useRouter();
-  const { validationResult, setExecutionResult } = usePayrun();
+  const { validationResult, setExecutionResult, fxChoice, setFxChoice } = usePayrun();
   const [isExecuting, setIsExecuting] = useState(false);
-  const [selectedFxOption, setSelectedFxOption] = useState('convert-now');
   const approvedRows = validationResult?.valid ?? [];
   const warningRows = validationResult?.warnings ?? [];
   const summary = buildPaymentSummary([...approvedRows, ...warningRows]);
@@ -41,7 +40,7 @@ export default function PaymentSummaryPage() {
       const response = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rows: allRows, fxOption: selectedFxOption }),
+        body: JSON.stringify({ rows: allRows, fxOption: fxChoice }),
       });
 
       if (!response.ok) {
@@ -84,16 +83,16 @@ export default function PaymentSummaryPage() {
         </div>
 
         <PaymentSummaryCard summary={summary} />
-        <FxOptions plan={summary.fxPlan} onSelect={setSelectedFxOption} />
+        <FxOptions plan={summary.fxPlan} onSelect={setFxChoice} />
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
             onClick={executePayroll}
-            disabled={isExecuting}
+            disabled={isExecuting || !fxChoice}
             className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isExecuting ? 'Processing…' : 'Execute payroll'}
+            {isExecuting ? 'Processing…' : fxChoice ? 'Execute payroll' : 'Choose FX option to execute'}
           </button>
           <button
             type="button"
@@ -107,4 +106,3 @@ export default function PaymentSummaryPage() {
     </Layout>
   );
 }
-

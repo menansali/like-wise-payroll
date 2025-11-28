@@ -12,8 +12,10 @@ type PayrunContextValue = {
   rows: PayrollRow[];
   validationResult: ValidationResult | null;
   executionResult: ExecutionResult | null;
+  fxChoice: string | null;
   setValidationResult: (rows: PayrollRow[], result: ValidationResult) => void;
   setExecutionResult: (result: ExecutionResult) => void;
+  setFxChoice: (id: string | null) => void;
   reset: () => void;
   isHydrated: boolean;
   derived: {
@@ -42,6 +44,7 @@ function saveToStorage(data: {
   rows: PayrollRow[];
   validationResult: ValidationResult | null;
   executionResult: ExecutionResult | null;
+  fxChoice: string | null;
 }) {
   if (typeof window === 'undefined') return;
   try {
@@ -71,6 +74,7 @@ export function PayrunProvider({
   );
   const [executionResult, setExecutionResult] =
     useState<ExecutionResult | null>(null);
+  const [fxChoice, setFxChoice] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate from localStorage on mount
@@ -80,6 +84,7 @@ export function PayrunProvider({
       setRows(stored.rows || []);
       setValidation(stored.validationResult || null);
       setExecutionResult(stored.executionResult || null);
+      setFxChoice(stored.fxChoice || null);
     }
     setIsHydrated(true);
   }, []);
@@ -87,9 +92,9 @@ export function PayrunProvider({
   // Persist to localStorage on changes
   useEffect(() => {
     if (isHydrated) {
-      saveToStorage({ rows, validationResult, executionResult });
+      saveToStorage({ rows, validationResult, executionResult, fxChoice });
     }
-  }, [rows, validationResult, executionResult, isHydrated]);
+  }, [rows, validationResult, executionResult, fxChoice, isHydrated]);
 
   const derived = useMemo(() => {
     const countryCount = new Set(rows.map((row) => row.country)).size;
@@ -103,6 +108,7 @@ export function PayrunProvider({
     setRows([]);
     setValidation(null);
     setExecutionResult(null);
+    setFxChoice(null);
     clearStorage();
   };
 
@@ -111,12 +117,15 @@ export function PayrunProvider({
     rows,
     validationResult,
     executionResult,
+    fxChoice,
     setValidationResult: (nextRows, result) => {
       setRows(nextRows);
       setValidation(result);
       setExecutionResult(null);
+      setFxChoice(null);
     },
     setExecutionResult,
+    setFxChoice,
     reset,
     isHydrated,
     derived,
@@ -135,4 +144,3 @@ export function usePayrun() {
 
   return ctx;
 }
-

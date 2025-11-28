@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '@/components/Card';
 import type { FxPlan } from '@/lib/types';
+import { usePayrun } from '@/context/PayrunContext';
 
 type Props = {
   plan?: FxPlan;
@@ -10,10 +11,16 @@ type Props = {
 };
 
 export default function FxOptions({ plan, onSelect }: Props) {
-  const [selected, setSelected] = useState<string | null>('convert-now');
+  const { fxChoice, setFxChoice } = usePayrun();
+  const [selected, setSelected] = useState<string | null>(fxChoice);
+
+  useEffect(() => {
+    setSelected(fxChoice);
+  }, [fxChoice]);
 
   const handleSelect = (optionId: string) => {
     setSelected(optionId);
+    setFxChoice(optionId);
     onSelect?.(optionId);
   };
 
@@ -103,4 +110,3 @@ function formatCurrency(amount: number, currency: string) {
     maximumFractionDigits: 0,
   }).format(amount);
 }
-

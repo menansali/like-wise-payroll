@@ -4,6 +4,10 @@ import Link from 'next/link';
 import Layout from '@/components/Layout';
 import Card from '@/components/Card';
 import NotificationBanner from '@/components/NotificationBanner';
+import CategoryChips from '@/components/CategoryChips';
+import CurrencyGrid from '@/components/dashboard/CurrencyGrid';
+import PayrollRunTable from '@/components/payroll/PayrollRunTable';
+import { currencyNeeds, payrollFilters, payrollRunRows } from '@/lib/mockData';
 import { usePayrun } from '@/context/PayrunContext';
 
 export default function PayrollLandingPage() {
@@ -33,6 +37,21 @@ export default function PayrollLandingPage() {
           <Stat label="Last upload" value={rows.length ? 'Moments ago' : 'None'} />
         </div>
 
+        <div className="space-y-4 rounded-3xl border border-slate-200 bg-white/80 p-6">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-500">
+                Upcoming payrolls
+              </p>
+              <h2 className="text-xl font-semibold text-slate-900">
+                Multi-currency coverage
+              </h2>
+            </div>
+            <CategoryChips filters={payrollFilters} />
+          </div>
+          <CurrencyGrid currencies={currencyNeeds} />
+        </div>
+
         <Card title="Steps">
           <ol className="list-decimal space-y-3 pl-4 text-sm text-slate-600">
             <li>Export payroll data from your HRIS</li>
@@ -40,6 +59,8 @@ export default function PayrollLandingPage() {
             <li>Review warnings and summary before execution</li>
           </ol>
         </Card>
+
+        <PayrollRunTable rows={payrollRunRows} />
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
