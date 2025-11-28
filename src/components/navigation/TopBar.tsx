@@ -20,9 +20,9 @@ export default function TopBar() {
         </button>
         <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white">
-            AM
+            KR
           </span>
-          Alex Morgan
+          Kunnar Raghav
         </div>
       </div>
     </header>

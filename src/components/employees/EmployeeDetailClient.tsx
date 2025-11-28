@@ -3,6 +3,7 @@
 import Card from '@/components/Card';
 import type { EmployeeRecord } from '@/lib/types';
 import { useState } from 'react';
+import UpdateSalaryModal from './UpdateSalaryModal';
 
 type Props = {
   employee: EmployeeRecord;
@@ -12,19 +13,17 @@ export default function EmployeeDetailClient({ employee }: Props) {
   const [status, setStatus] = useState(employee.status);
   const [salary, setSalary] = useState(employee.payroll.salary);
   const [banner, setBanner] = useState<string | null>(null);
+  const [salaryModalOpen, setSalaryModalOpen] = useState(false);
 
-  const markSkipped = () => {
-    setStatus('Skipped this cycle');
-    setBanner('This employee has been marked as skipped for the current payroll run.');
-  };
-
-  const bumpSalary = () => {
-    setSalary((current) => `${current} · updated mock value`);
-    setBanner('Salary updated for this demo. Persist this change in a real backend later.');
+  const handleUpdateSalary = (newSalary: string) => {
+    setSalary(newSalary);
+    setBanner('Salary updated successfully! This would be saved in production.');
+    setTimeout(() => setBanner(null), 3000);
   };
 
   const touchSchedule = () => {
     setBanner('Schedule updated. In production this would resync with your HRIS and Wise.');
+    setTimeout(() => setBanner(null), 3000);
   };
 
   return (
@@ -47,14 +46,7 @@ export default function EmployeeDetailClient({ employee }: Props) {
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            onClick={markSkipped}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Skip payment
-          </button>
-          <button
-            type="button"
-            onClick={bumpSalary}
+            onClick={() => setSalaryModalOpen(true)}
             className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
           >
             Update salary
@@ -134,6 +126,14 @@ export default function EmployeeDetailClient({ employee }: Props) {
           ))}
         </div>
       </Card>
+
+      <UpdateSalaryModal
+        isOpen={salaryModalOpen}
+        onClose={() => setSalaryModalOpen(false)}
+        currentSalary={salary}
+        currency={employee.payroll.paymentCurrency}
+        onUpdate={handleUpdateSalary}
+      />
     </div>
   );
 }

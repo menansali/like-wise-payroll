@@ -7,6 +7,7 @@ import BudgetInputCard from '@/components/smart-budget/BudgetInputCard';
 import ScheduleTable from '@/components/smart-budget/ScheduleTable';
 import CategoryFilterButton from '@/components/smart-budget/CategoryFilterButton';
 import LockPriceModal from '@/components/smart-budget/LockPriceModal';
+import SavingsPopup from '@/components/smart-budget/SavingsPopup';
 import { smartBudgetSchedule } from '@/lib/mockData';
 import type { SmartBudgetScheduleRow } from '@/lib/types';
 
@@ -15,12 +16,24 @@ export default function SmartBudgetPage() {
   const [lockModalOpen, setLockModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<SmartBudgetScheduleRow | null>(null);
   const [selectedQuarter, setSelectedQuarter] = useState('Quarter 1');
+  const [savingsPopupOpen, setSavingsPopupOpen] = useState(false);
+  const [budgetAmount, setBudgetAmount] = useState<number>(0);
 
-  const handleBudgetSubmit = (_amount: string) => {
-    // Simulate budget creation
+  const handleBudgetSubmit = (amount: string) => {
+    // Parse amount (remove £ and commas)
+    const numericAmount = parseFloat(amount.replace(/[£,\s]/g, ''));
+    
+    if (!isNaN(numericAmount) && numericAmount > 0) {
+      setBudgetAmount(numericAmount);
+      setSavingsPopupOpen(true);
+    }
+    // Budget created - ready for API integration
+  };
+
+  const handleLockRateNow = () => {
+    setSavingsPopupOpen(false);
     setBudgetCreated(true);
     setTimeout(() => setBudgetCreated(false), 3000);
-    // Budget created - ready for API integration
   };
 
   const handleLockClick = (row: SmartBudgetScheduleRow) => {
@@ -77,17 +90,19 @@ export default function SmartBudgetPage() {
           </div>
         )}
 
-        <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-emerald-100">
-            Converting alert
-          </p>
-          <p className="mt-2 text-lg font-semibold text-white">
-            Save 2% more. Convert USD → INR now.
-          </p>
-          <p className="text-sm text-emerald-100">
-            Lock today&apos;s rate to maximize savings on your next payroll run.
-          </p>
-        </section>
+        {!savingsPopupOpen && (
+          <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
+            <p className="text-xs uppercase tracking-wide text-emerald-100">
+              Converting alert
+            </p>
+            <p className="mt-2 text-lg font-semibold text-white">
+              Save 2% more. Convert USD → INR now.
+            </p>
+            <p className="text-sm text-emerald-100">
+              Lock today&apos;s rate to maximize savings on your next payroll run.
+            </p>
+          </section>
+        )}
 
         <ScheduleTable rows={smartBudgetSchedule} onLockClick={handleLockClick} />
       </div>
@@ -104,6 +119,14 @@ export default function SmartBudgetPage() {
           onLock={handleLockSubmit}
         />
       )}
+
+      <SavingsPopup
+        isOpen={savingsPopupOpen}
+        onClose={() => setSavingsPopupOpen(false)}
+        onLockRateNow={handleLockRateNow}
+        amount={budgetAmount}
+        savingsPercent={2}
+      />
     </Layout>
   );
 }

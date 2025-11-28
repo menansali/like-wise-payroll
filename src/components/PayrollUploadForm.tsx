@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import { usePayrun } from '@/context/PayrunContext';
 import { parseCsv } from '@/lib/csv';
+import { generateDemoPayrollRows } from '@/lib/generateDemoPayroll';
 import type { PayrollRow, ValidationResult } from '@/lib/types';
 
 type Props = {
@@ -83,13 +84,13 @@ export default function PayrollUploadForm({ onComplete }: Props) {
     setFileName('demo-payroll.csv');
 
     try {
-      const response = await fetch('/demo-payroll.csv');
-      const text = await response.text();
-      const rows = parseCsv(text);
+      // Generate random demo data each time
+      const rowCount = Math.floor(Math.random() * 8) + 8; // Random between 8-15 employees
+      const rows = generateDemoPayrollRows(rowCount);
       await runValidation(rows);
     } catch (demoError) {
       setError(
-        demoError instanceof Error ? demoError.message : 'Unable to load demo file',
+        demoError instanceof Error ? demoError.message : 'Unable to generate demo file',
       );
     } finally {
       setDemoLoading(false);
