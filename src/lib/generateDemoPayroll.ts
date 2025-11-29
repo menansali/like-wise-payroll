@@ -3,7 +3,7 @@ import type { PayrollRow } from '@/lib/types';
 // Sample data pools for generating random payroll entries
 const FIRST_NAMES = [
   'Alicia', 'Jonas', 'Luis', 'Sophia', 'Mei', 'Marcus', 'Yuki', 'Anna',
-  'Carlos', 'Emma', 'Raj', 'Marie', 'David', 'Sarah', 'James', 'Yuki',
+  'Carlos', 'Emma', 'Raj', 'Marie', 'David', 'Sarah', 'James',
   'Michael', 'Priya', 'Hans', 'Linda', 'Chen', 'Oliver', 'Isabella', 'Mohamed',
   'Grace', 'Thomas', 'Rina', 'Pierre', 'Nina', 'Ahmed',
 ];
@@ -15,54 +15,62 @@ const LAST_NAMES = [
   'Fernandez', 'Thompson', 'Sato', 'Lopez', 'Hansen', 'Okafor',
 ];
 
+// Only use countries/currencies that are supported by validation rules
 const COUNTRIES = [
-  'India', 'Germany', 'Brazil', 'United Kingdom', 'Singapore', 'United States',
-  'Japan', 'Poland', 'France', 'Canada', 'Australia', 'South Korea', 'Mexico',
-  'Netherlands', 'Spain', 'Italy', 'Argentina', 'Kenya', 'Hong Kong',
+  'United States', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands',
+  'United Kingdom', 'India', 'Brazil', 'Singapore', 'Japan', 'Canada',
+  'Australia', 'Switzerland', 'Mexico', 'Poland',
 ];
 
 const CURRENCY_MAP: Record<string, string[]> = {
-  'India': ['INR'],
-  'Germany': ['EUR'],
-  'Brazil': ['BRL'],
-  'United Kingdom': ['GBP'],
-  'Singapore': ['SGD'],
   'United States': ['USD'],
-  'Japan': ['JPY'],
-  'Poland': ['PLN', 'EUR'],
+  'Germany': ['EUR'],
   'France': ['EUR'],
-  'Canada': ['CAD'],
-  'Australia': ['AUD'],
-  'South Korea': ['KRW'],
-  'Mexico': ['MXN'],
-  'Netherlands': ['EUR'],
   'Spain': ['EUR'],
   'Italy': ['EUR'],
-  'Argentina': ['ARS'],
-  'Kenya': ['KES'],
-  'Hong Kong': ['HKD'],
+  'Netherlands': ['EUR'],
+  'United Kingdom': ['GBP'],
+  'India': ['INR'],
+  'Brazil': ['BRL'],
+  'Singapore': ['SGD'],
+  'Japan': ['JPY'],
+  'Canada': ['CAD'],
+  'Australia': ['AUD'],
+  'Switzerland': ['CHF'],
+  'Mexico': ['MXN'],
+  'Poland': ['PLN', 'EUR'],
+};
+
+// IBAN lengths by country (matching validation.ts requirements)
+const IBAN_LENGTHS: Record<string, number> = {
+  'Germany': 22,
+  'France': 27,
+  'Spain': 24,
+  'Italy': 27,
+  'Netherlands': 18,
+  'United Kingdom': 22,
+  'Poland': 28,
+  'Switzerland': 21,
 };
 
 const IBAN_PREFIXES: Record<string, string> = {
-  'India': 'IN',
   'Germany': 'DE',
-  'Brazil': 'BR',
+  'France': 'FR',
+  'Spain': 'ES',
+  'Italy': 'IT',
+  'Netherlands': 'NL',
   'United Kingdom': 'GB',
+  'Poland': 'PL',
+  'Switzerland': 'CH',
+  // For countries without strict IBAN requirements
+  'India': 'IN',
+  'Brazil': 'BR',
   'Singapore': 'SG',
   'United States': 'US',
   'Japan': 'JP',
-  'Poland': 'PL',
-  'France': 'FR',
   'Canada': 'CA',
   'Australia': 'AU',
-  'South Korea': 'KR',
   'Mexico': 'MX',
-  'Netherlands': 'NL',
-  'Spain': 'ES',
-  'Italy': 'IT',
-  'Argentina': 'AR',
-  'Kenya': 'KE',
-  'Hong Kong': 'HK',
 };
 
 function randomChoice<T>(array: T[]): T {
@@ -75,7 +83,18 @@ function randomInt(min: number, max: number): number {
 
 function generateBankAccount(country: string): string {
   const prefix = IBAN_PREFIXES[country] || 'XX';
-  const length = randomInt(16, 22);
+  
+  // Use proper IBAN length if defined for this country
+  const requiredLength = IBAN_LENGTHS[country];
+  if (requiredLength) {
+    const numbers = Array.from({ length: requiredLength - 2 }, () =>
+      randomInt(0, 9).toString(),
+    ).join('');
+    return `${prefix}${numbers}`;
+  }
+  
+  // For countries without IBAN requirements, generate valid account (min 10 chars)
+  const length = randomInt(12, 18);
   const numbers = Array.from({ length: length - 2 }, () =>
     randomInt(0, 9).toString(),
   ).join('');
@@ -83,31 +102,32 @@ function generateBankAccount(country: string): string {
 }
 
 function generateAmount(currency: string): number {
-  // Generate realistic amounts based on currency
+  // Generate realistic amounts based on currency (avoid round numbers to reduce warnings)
+  // Keep amounts under LARGE_PAYMENT_THRESHOLD (10000) to avoid warnings
   const ranges: Record<string, { min: number; max: number }> = {
-    USD: { min: 3000, max: 12000 },
-    EUR: { min: 2500, max: 10000 },
-    GBP: { min: 2000, max: 8000 },
-    INR: { min: 50000, max: 200000 },
-    BRL: { min: 10000, max: 50000 },
-    SGD: { min: 4000, max: 15000 },
-    JPY: { min: 400000, max: 1500000 },
-    PLN: { min: 8000, max: 30000 },
-    CAD: { min: 3500, max: 12000 },
-    AUD: { min: 4000, max: 14000 },
-    KRW: { min: 3000000, max: 15000000 },
-    MXN: { min: 50000, max: 200000 },
-    ARS: { min: 500000, max: 3000000 },
-    KES: { min: 300000, max: 1200000 },
-    HKD: { min: 20000, max: 80000 },
+    USD: { min: 2500, max: 9500 },
+    EUR: { min: 2200, max: 9800 },
+    GBP: { min: 1800, max: 9200 },
+    INR: { min: 45000, max: 98000 },
+    BRL: { min: 8500, max: 9800 },
+    SGD: { min: 3200, max: 9800 },
+    JPY: { min: 350000, max: 980000 },
+    PLN: { min: 7200, max: 9800 },
+    CAD: { min: 2800, max: 9800 },
+    AUD: { min: 3200, max: 9800 },
+    CHF: { min: 2800, max: 9800 },
+    MXN: { min: 45000, max: 98000 },
   };
 
-  const range = ranges[currency] || { min: 1000, max: 10000 };
-  return randomInt(range.min, range.max);
+  const range = ranges[currency] || { min: 1000, max: 9000 };
+  // Generate non-round numbers (add random cents/digits to avoid round number warnings)
+  const baseAmount = randomInt(range.min, range.max);
+  const variation = randomInt(1, 99); // Add 1-99 to make it non-round
+  return Math.round((baseAmount + (variation / 100)) * 100) / 100;
 }
 
 /**
- * Generate random demo payroll data
+ * Generate random demo payroll data with valid data that passes validation
  */
 export function generateDemoPayrollRows(count: number = 12): PayrollRow[] {
   const rows: PayrollRow[] = [];
@@ -179,4 +199,3 @@ export function payrollRowsToCsv(rows: PayrollRow[]): string {
 
   return csvRows.join('\n');
 }
-
