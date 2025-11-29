@@ -385,11 +385,11 @@ npm run format   # Format code with Prettier
 
 ## 🤝 Contributing
 
-This project was built for the Wise Hackathon 2024. For questions or contributions, please reach out to the team.
+This project was built for the Wise Hackathon 2025. For questions or contributions, please reach out to the team.
 
 ## 📄 License
 
-This project was created for the Wise Hackathon 2024.
+This project was created for the Wise Hackathon 2025.
 
 ## 🏆 Acknowledgments
 
