@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
+import Badge from '@/components/ui/Badge';
 import { workforceSnapshot as defaultSnapshot } from '@/lib/mockData';
 
 const formatter = new Intl.NumberFormat('en-US', {
@@ -35,15 +36,15 @@ export default function WorkforceSnapshot() {
 
   if (isLoading) {
     return (
-      <Card title="Workforce Snapshot">
+      <Card title="Workforce Snapshot" variant="elevated">
         <div className="animate-pulse space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-20 rounded-lg bg-slate-100" />
-            <div className="h-20 rounded-lg bg-slate-100" />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="h-24 rounded-2xl bg-slate-100" />
+            <div className="h-24 rounded-2xl bg-slate-100" />
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-lg bg-slate-100" />
+              <div key={i} className="h-16 rounded-2xl bg-slate-100" />
             ))}
           </div>
         </div>
@@ -52,41 +53,43 @@ export default function WorkforceSnapshot() {
   }
 
   return (
-    <Card title="Workforce Snapshot">
-      <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg bg-slate-50 p-4">
-            <p className="text-sm text-slate-500">New joiners this month</p>
-            <p className="text-2xl font-semibold text-slate-900">
+    <Card title="Workforce Snapshot" variant="elevated">
+      <div className="space-y-8">
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition-shadow hover:shadow-md">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              New joiners this month
+            </p>
+            <p className="mt-3 text-3xl font-bold text-slate-900">
               +{data.newJoiners}
             </p>
           </div>
-          <div className="rounded-lg bg-slate-50 p-4">
-            <p className="text-sm text-slate-500">Offboarded</p>
-            <p className="text-2xl font-semibold text-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition-shadow hover:shadow-md">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Offboarded
+            </p>
+            <p className="mt-3 text-3xl font-bold text-slate-900">
               {data.offboarded}
             </p>
           </div>
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">
-            Totals by country
-          </p>
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-900">Totals by country</h3>
           <div className="space-y-3">
             {data.countries.map((country) => (
               <div
                 key={country.country}
-                className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2"
+                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div>
-                  <p className="font-medium text-slate-800">{country.country}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="font-bold text-slate-900">{country.country}</p>
+                  <p className="mt-1 text-sm text-slate-600">
                     {country.employees} employees · {country.contractors}{' '}
                     contractors
                   </p>
                 </div>
-                <p className="text-sm font-semibold text-slate-900">
+                <p className="text-lg font-bold text-slate-900">
                   {formatter.format(country.cost)}
                 </p>
               </div>
@@ -94,19 +97,17 @@ export default function WorkforceSnapshot() {
           </div>
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">
-            Classification mix
-          </p>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <span className="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-1 text-green-700">
-              <span className="h-2 w-2 rounded-full bg-green-500" />
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-900">Classification mix</h3>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="success" size="md">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-emerald-500" />
               Employees {data.classification.employees}
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              <span className="h-2 w-2 rounded-full bg-slate-500" />
+            </Badge>
+            <Badge variant="default" size="md">
+              <span className="mr-2 inline-block h-2 w-2 rounded-full bg-slate-500" />
               Contractors {data.classification.contractors}
-            </span>
+            </Badge>
           </div>
         </div>
       </div>

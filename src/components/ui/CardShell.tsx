@@ -1,28 +1,27 @@
 import clsx from 'clsx';
 
-type CardProps = {
+type CardShellProps = {
   title?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   actions?: React.ReactNode;
-  variant?: 'default' | 'dark' | 'elevated';
+  variant?: 'default' | 'elevated' | 'outlined';
   padding?: 'sm' | 'md' | 'lg';
 };
 
-export default function Card({
+export default function CardShell({
   title,
   children,
   className,
   actions,
   variant = 'default',
   padding = 'md',
-}: CardProps) {
-  const variantClasses =
-    variant === 'dark'
-      ? 'border-slate-900 bg-slate-900 text-white'
-      : variant === 'elevated'
-        ? 'border-slate-200 bg-white shadow-md'
-        : 'border-slate-200 bg-white shadow-sm';
+}: CardShellProps) {
+  const variantClasses = {
+    default: 'border border-slate-200 bg-white shadow-sm',
+    elevated: 'border border-slate-200 bg-white shadow-md',
+    outlined: 'border-2 border-slate-200 bg-white',
+  };
 
   const paddingClasses = {
     sm: 'p-4',
@@ -33,21 +32,16 @@ export default function Card({
   return (
     <section
       className={clsx(
-        'rounded-2xl border transition-shadow hover:shadow-md',
-        variantClasses,
+        'rounded-2xl',
+        variantClasses[variant],
         paddingClasses[padding],
-        className, // className comes last to allow overrides
+        className,
       )}
     >
       {(title || actions) && (
         <div className="mb-6 flex items-center justify-between gap-4">
           {title && (
-            <h2
-              className={clsx('text-xl font-bold lg:text-2xl', {
-                'text-white': variant === 'dark',
-                'text-slate-900': variant !== 'dark',
-              })}
-            >
+            <h2 className="text-xl font-bold text-slate-900 lg:text-2xl">
               {title}
             </h2>
           )}

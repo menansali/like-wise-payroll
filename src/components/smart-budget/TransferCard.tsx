@@ -1,3 +1,9 @@
+'use client';
+
+import { useState } from 'react';
+import Button from '@/components/ui/Button';
+import AlertBanner from '@/components/ui/AlertBanner';
+
 type Props = {
   baseLabel: string;
   baseValue: string;
@@ -23,6 +29,17 @@ export default function TransferCard({
   status,
   paymentMethod,
 }: Props) {
+  const [isSending, setIsSending] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleSendMoney = async () => {
+    setIsSending(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsSending(false);
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 5000);
+  };
   return (
     <div className="rounded-3xl border border-slate-200 bg-white/80 shadow-sm">
       <div className="border-b border-slate-100 px-6 py-4">
@@ -57,10 +74,23 @@ export default function TransferCard({
         </p>
         <p className="font-semibold text-slate-900">{paymentMethod}</p>
       </div>
-      <div className="border-t border-slate-100 px-6 py-4">
-        <button className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800">
+      <div className="border-t border-slate-100 px-6 py-4 space-y-4">
+        {showSuccess && (
+          <AlertBanner
+            message={`Transfer of ${targetValue} ${targetCurrency} initiated successfully. This would process via Wise in production.`}
+            variant="success"
+            title="Transfer Initiated"
+          />
+        )}
+        <Button
+          onClick={handleSendMoney}
+          disabled={isSending}
+          isLoading={isSending}
+          className="w-full"
+          size="lg"
+        >
           Send money
-        </button>
+        </Button>
       </div>
     </div>
   );

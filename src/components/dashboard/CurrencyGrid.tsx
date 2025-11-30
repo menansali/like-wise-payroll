@@ -1,4 +1,5 @@
 import Card from '@/components/Card';
+import Badge from '@/components/ui/Badge';
 import type { CurrencyNeed } from '@/lib/types';
 
 type Props = {
@@ -6,36 +7,48 @@ type Props = {
 };
 
 export default function CurrencyGrid({ currencies }: Props) {
+  const getStatusBadge = (status: CurrencyNeed['status']) => {
+    switch (status) {
+      case 'running-low':
+        return <Badge variant="warning" size="sm">Running low</Badge>;
+      case 'surplus':
+        return <Badge variant="success" size="sm">Covered</Badge>;
+      default:
+        return <Badge variant="default" size="sm">Open</Badge>;
+    }
+  };
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {currencies.map((item) => (
-        <Card key={item.id} className="h-full">
-          <div className="flex items-center justify-between text-sm text-slate-500">
-            <span className="inline-flex items-center gap-2">
-              <span className="text-lg">{item.flag}</span>
+        <Card key={item.id} className="h-full transition-shadow hover:shadow-md">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-600">
+              <span className="text-xl">{item.flag}</span>
               {item.country}
             </span>
-            <span
-              className="rounded-full px-2 py-0.5 text-xs font-semibold"
-              data-status={item.status}
-            >
-              {item.status === 'running-low' ? 'Running low' : item.status === 'surplus' ? 'Covered' : 'Open'}
-            </span>
+            {getStatusBadge(item.status)}
           </div>
-          <p className="mt-4 text-xs uppercase tracking-wide text-slate-500">
-            {item.currencyLabel}
-          </p>
-          <p className="text-2xl font-semibold text-slate-900">
-            {formatNumber(item.requiredAmount)}
-          </p>
-          <p className="mt-4 text-xs uppercase tracking-wide text-slate-500">
-            You need
-          </p>
-          <p className="text-lg font-semibold text-slate-900">
-            {formatNumber(item.bufferAmount)}
-          </p>
+          <div className="mt-6 space-y-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                {item.currencyLabel}
+              </p>
+              <p className="mt-2 text-3xl font-bold text-slate-900">
+                {formatNumber(item.requiredAmount)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                You need
+              </p>
+              <p className="mt-2 text-xl font-semibold text-slate-900">
+                {formatNumber(item.bufferAmount)}
+              </p>
+            </div>
+          </div>
           {item.message && (
-            <p className="mt-2 text-sm text-slate-500">{item.message}</p>
+            <p className="mt-4 text-sm text-slate-600">{item.message}</p>
           )}
         </Card>
       ))}

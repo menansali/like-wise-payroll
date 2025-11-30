@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/Layout';
 import Card from '@/components/Card';
@@ -9,60 +10,96 @@ import CurrencyGrid from '@/components/dashboard/CurrencyGrid';
 import PayrollRunTable from '@/components/payroll/PayrollRunTable';
 import { currencyNeeds, payrollFilters, payrollRunRows } from '@/lib/mockData';
 import { usePayrun } from '@/context/PayrunContext';
+import SectionHeader from '@/components/ui/SectionHeader';
+import Button from '@/components/ui/Button';
+import StatCard from '@/components/ui/StatCard';
+import type { CurrencyNeed } from '@/lib/types';
 
 export default function PayrollLandingPage() {
   const { payrollPeriod, derived, rows } = usePayrun();
+  const [selectedFilter, setSelectedFilter] = useState(payrollFilters[0]?.id ?? '');
+
+  const filteredCurrencies = useMemo(() => {
+    if (!selectedFilter || selectedFilter === 'all') {
+      return currencyNeeds;
+    }
+    
+    // Mock filtering logic - filter by status
+    return currencyNeeds.filter((currency) => {
+      if (selectedFilter === 'open') {
+        return currency.status === 'open';
+      }
+      if (selectedFilter === 'running-low') {
+        return currency.status === 'running-low';
+      }
+      if (selectedFilter === 'surplus') {
+        return currency.status === 'surplus';
+      }
+      return true;
+    });
+  }, [selectedFilter]);
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex flex-col gap-2">
-          <p className="text-sm uppercase tracking-wide text-slate-500">
-            Current run
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            {payrollPeriod}
-          </h1>
-          <p className="text-sm text-slate-500">
-            Review the scope of the current cycle before uploading the payroll
-            file.
-          </p>
-        </div>
+      <div className="space-y-8">
+        <SectionHeader
+          subtitle="Current run"
+          title={payrollPeriod}
+          description="Review the scope of the current cycle before uploading the payroll file."
+        />
 
-        <NotificationBanner message="Payroll due in 7 days for your team" />
+        <NotificationBanner
+          message="Payroll due in 7 days for your team"
+          variant="info"
+        />
 
-        <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-emerald-100">
+        <Card variant="default" className="!border-emerald-500 !bg-emerald-500 !text-white">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">
             Smart budget
           </p>
-          <p className="mt-2 text-lg font-semibold text-white">
+          <p className="mt-3 text-xl font-bold text-white lg:text-2xl">
             Save 2% more. Convert USD → INR now.
           </p>
-        </section>
+        </Card>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <Stat label="Workers in scope" value={derived.workerCount || '—'} />
-          <Stat label="Countries covered" value={derived.countryCount || '—'} />
-          <Stat label="Last upload" value={rows.length ? 'Moments ago' : 'None'} />
+        <div className="grid gap-6 md:grid-cols-3">
+          <StatCard
+            label="Workers in scope"
+            value={derived.workerCount || '—'}
+          />
+          <StatCard
+            label="Countries covered"
+            value={derived.countryCount || '—'}
+          />
+          <StatCard
+            label="Last upload"
+            value={rows.length ? 'Moments ago' : 'None'}
+          />
         </div>
 
-        <div className="space-y-4 rounded-3xl border border-slate-200 bg-white/80 p-6">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">
-                Upcoming payrolls
-              </p>
-              <h2 className="text-xl font-semibold text-slate-900">
-                Multi-currency coverage
-              </h2>
+        <Card variant="elevated" padding="lg">
+          <div className="space-y-6">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Upcoming payrolls
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-slate-900 lg:text-3xl">
+                  Multi-currency coverage
+                </h2>
+              </div>
+              <CategoryChips 
+                filters={payrollFilters} 
+                onChange={setSelectedFilter}
+                defaultFilter={selectedFilter}
+              />
             </div>
-            <CategoryChips filters={payrollFilters} />
+            <CurrencyGrid currencies={filteredCurrencies} />
           </div>
-          <CurrencyGrid currencies={currencyNeeds} />
-        </div>
+        </Card>
 
-        <Card title="Steps">
-          <ol className="list-decimal space-y-3 pl-4 text-sm text-slate-600">
+        <Card title="Steps" variant="elevated">
+          <ol className="list-decimal space-y-4 pl-6 text-base text-slate-700">
             <li>Export payroll data from your HRIS</li>
             <li>Upload the CSV for validation</li>
             <li>Review warnings and summary before execution</li>
@@ -72,30 +109,17 @@ export default function PayrollLandingPage() {
         <PayrollRunTable rows={payrollRunRows} />
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/payroll/upload"
-            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800"
-          >
-            Upload payroll CSV
+          <Link href="/payroll/upload">
+            <Button size="lg">Upload payroll CSV</Button>
           </Link>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700"
-          >
-            Back to dashboard
+          <Link href="/dashboard">
+            <Button variant="secondary" size="lg">
+              Back to dashboard
+            </Button>
           </Link>
         </div>
       </div>
     </Layout>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="text-2xl font-semibold text-slate-900">{value}</p>
-    </div>
   );
 }
 

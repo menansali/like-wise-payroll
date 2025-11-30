@@ -7,10 +7,12 @@ import PaymentSummaryCard from '@/components/PaymentSummaryCard';
 import FxOptions from '@/components/FxOptions';
 import { usePayrun } from '@/context/PayrunContext';
 import { buildPaymentSummary } from '@/lib/summary';
+import SectionHeader from '@/components/ui/SectionHeader';
+import Button from '@/components/ui/Button';
 
 export default function PaymentSummaryPage() {
   const router = useRouter();
-  const { validationResult, setExecutionResult, fxChoice, setFxChoice } = usePayrun();
+  const { validationResult, setExecutionResult, fxChoice, setFxChoice, fxPlanDetails } = usePayrun();
   const [isExecuting, setIsExecuting] = useState(false);
   const approvedRows = validationResult?.valid ?? [];
   const warningRows = validationResult?.warnings ?? [];
@@ -19,15 +21,15 @@ export default function PaymentSummaryPage() {
   if (!validationResult) {
     return (
       <Layout>
-        <div className="space-y-4 text-sm text-slate-600">
-          <p>No validation data available.</p>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-            onClick={() => router.push('/payroll/upload')}
-          >
+        <div className="space-y-6">
+          <SectionHeader
+            subtitle="Review payouts"
+            title="Payment summary"
+            description="No validation data available. Please upload a payroll file first."
+          />
+          <Button onClick={() => router.push('/payroll/upload')}>
             Upload a payroll file
-          </button>
+          </Button>
         </div>
       </Layout>
     );
@@ -51,6 +53,8 @@ export default function PaymentSummaryPage() {
       setExecutionResult({
         successCount: result.successCount,
         failedCount: result.failedCount,
+        fxDecision: result.fxOption || fxChoice || undefined,
+        fxPlanDetails: fxPlanDetails || undefined,
       });
       router.push('/payroll/confirmation');
     } catch (error) {
@@ -59,6 +63,8 @@ export default function PaymentSummaryPage() {
       setExecutionResult({
         successCount: approvedRows.length,
         failedCount: warningRows.length,
+        fxDecision: fxChoice || undefined,
+        fxPlanDetails: fxPlanDetails || undefined,
       });
       router.push('/payroll/confirmation');
     } finally {
@@ -68,39 +74,32 @@ export default function PaymentSummaryPage() {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-slate-500">
-            Review payouts
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Payment summary
-          </h1>
-          <p className="text-sm text-slate-500">
-            FX totals, estimated fees, and settlement times derived from the last
-            validated file. Choose how to fund this payroll before executing.
-          </p>
-        </div>
+      <div className="space-y-8">
+        <SectionHeader
+          subtitle="Review payouts"
+          title="Payment summary"
+          description="FX totals, estimated fees, and settlement times derived from the last validated file. Choose how to fund this payroll before executing."
+        />
 
         <PaymentSummaryCard summary={summary} />
         <FxOptions plan={summary.fxPlan} onSelect={setFxChoice} />
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
+          <Button
             onClick={executePayroll}
             disabled={isExecuting || !fxChoice}
-            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+            isLoading={isExecuting}
+            size="lg"
           >
-            {isExecuting ? 'Processing…' : fxChoice ? 'Execute payroll' : 'Choose FX option to execute'}
-          </button>
-          <button
-            type="button"
+            {fxChoice ? 'Execute payroll' : 'Choose FX option to execute'}
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => router.push('/payroll/upload')}
-            className="inline-flex items-center justify-center rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700"
+            size="lg"
           >
             Back to validation
-          </button>
+          </Button>
         </div>
       </div>
     </Layout>

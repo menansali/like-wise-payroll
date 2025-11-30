@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type {
   ExecutionResult,
+  FxPlanDetails,
   PayrollRow,
   ValidationResult,
 } from '@/lib/types';
@@ -13,9 +14,11 @@ type PayrunContextValue = {
   validationResult: ValidationResult | null;
   executionResult: ExecutionResult | null;
   fxChoice: string | null;
+  fxPlanDetails: FxPlanDetails | null;
   setValidationResult: (rows: PayrollRow[], result: ValidationResult) => void;
   setExecutionResult: (result: ExecutionResult) => void;
   setFxChoice: (id: string | null) => void;
+  setFxPlanDetails: (details: FxPlanDetails | null) => void;
   reset: () => void;
   isHydrated: boolean;
   derived: {
@@ -45,6 +48,7 @@ function saveToStorage(data: {
   validationResult: ValidationResult | null;
   executionResult: ExecutionResult | null;
   fxChoice: string | null;
+  fxPlanDetails: FxPlanDetails | null;
 }) {
   if (typeof window === 'undefined') return;
   try {
@@ -75,6 +79,7 @@ export function PayrunProvider({
   const [executionResult, setExecutionResult] =
     useState<ExecutionResult | null>(null);
   const [fxChoice, setFxChoice] = useState<string | null>(null);
+  const [fxPlanDetails, setFxPlanDetails] = useState<FxPlanDetails | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Hydrate from localStorage on mount
@@ -85,6 +90,7 @@ export function PayrunProvider({
       setValidation(stored.validationResult || null);
       setExecutionResult(stored.executionResult || null);
       setFxChoice(stored.fxChoice || null);
+      setFxPlanDetails(stored.fxPlanDetails || null);
     }
     setIsHydrated(true);
   }, []);
@@ -92,9 +98,9 @@ export function PayrunProvider({
   // Persist to localStorage on changes
   useEffect(() => {
     if (isHydrated) {
-      saveToStorage({ rows, validationResult, executionResult, fxChoice });
+      saveToStorage({ rows, validationResult, executionResult, fxChoice, fxPlanDetails });
     }
-  }, [rows, validationResult, executionResult, fxChoice, isHydrated]);
+  }, [rows, validationResult, executionResult, fxChoice, fxPlanDetails, isHydrated]);
 
   const derived = useMemo(() => {
     const countryCount = new Set(rows.map((row) => row.country)).size;
@@ -109,6 +115,7 @@ export function PayrunProvider({
     setValidation(null);
     setExecutionResult(null);
     setFxChoice(null);
+    setFxPlanDetails(null);
     clearStorage();
   };
 
@@ -118,14 +125,17 @@ export function PayrunProvider({
     validationResult,
     executionResult,
     fxChoice,
+    fxPlanDetails,
     setValidationResult: (nextRows, result) => {
       setRows(nextRows);
       setValidation(result);
       setExecutionResult(null);
       setFxChoice(null);
+      setFxPlanDetails(null);
     },
     setExecutionResult,
     setFxChoice,
+    setFxPlanDetails,
     reset,
     isHydrated,
     derived,

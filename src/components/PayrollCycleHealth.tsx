@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Card from '@/components/Card';
+import Badge from '@/components/ui/Badge';
 import { payrollCycleHealth as defaultData } from '@/lib/mockData';
 
 type CycleHealthData = typeof defaultData;
@@ -29,16 +30,16 @@ export default function PayrollCycleHealth() {
 
   if (isLoading) {
     return (
-      <Card title="Payroll Cycle Health">
+      <Card title="Payroll Cycle Health" variant="elevated">
         <div className="animate-pulse space-y-6">
-          <div className="h-24 rounded-lg bg-amber-50" />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="h-24 rounded-lg bg-slate-100" />
-            <div className="h-24 rounded-lg bg-slate-100" />
+          <div className="h-28 rounded-2xl bg-amber-50" />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="h-28 rounded-2xl bg-slate-100" />
+            <div className="h-28 rounded-2xl bg-slate-100" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-12 rounded-lg bg-slate-100" />
+              <div key={i} className="h-16 rounded-2xl bg-slate-100" />
             ))}
           </div>
         </div>
@@ -47,78 +48,76 @@ export default function PayrollCycleHealth() {
   }
 
   return (
-    <Card title="Payroll Cycle Health">
-      <div className="space-y-6">
-        <div className="rounded-lg border border-amber-100 bg-amber-50 p-4">
-          <p className="text-xs uppercase tracking-wide text-amber-700">
+    <Card title="Payroll Cycle Health" variant="elevated">
+      <div className="space-y-8">
+        <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
             Next deadline
           </p>
-          <p className="text-lg font-semibold text-amber-900">
+          <p className="mt-2 text-xl font-bold text-amber-900">
             {data.nextDeadline.region}
           </p>
-          <p className="text-sm text-amber-800">
+          <p className="mt-1 text-sm font-medium text-amber-800">
             Cut-off on {data.nextDeadline.date}
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg bg-slate-50 p-4">
-            <p className="text-sm text-slate-500">% payroll completed</p>
-            <p className="text-2xl font-semibold text-slate-900">
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition-shadow hover:shadow-md">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              % payroll completed
+            </p>
+            <p className="mt-3 text-3xl font-bold text-slate-900">
               {data.completion}%
             </p>
-            <div className="mt-2 h-2 rounded-full bg-slate-200">
+            <div className="mt-4 h-3 rounded-full bg-emerald-100">
               <div
-                className="h-2 rounded-full bg-slate-900 transition-all duration-500"
+                className="h-3 rounded-full bg-emerald-600 transition-all duration-500"
                 style={{ width: `${data.completion}%` }}
               />
             </div>
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-4">
-            <p className="text-sm text-slate-500">Pending approvals</p>
-            <p className="text-2xl font-semibold text-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm transition-shadow hover:shadow-md">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Pending approvals
+            </p>
+            <p className="mt-3 text-3xl font-bold text-slate-900">
               {data.pendingApprovals}
             </p>
           </div>
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">
-            Routing delays
-          </p>
-          <div className="space-y-2 text-sm text-slate-600">
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-900">Routing delays</h3>
+          <div className="space-y-3">
             {data.routingIssues.map((issue) => (
               <div
                 key={issue.region}
-                className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2"
+                className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition-shadow hover:shadow-md"
               >
-                <p className="font-medium text-slate-800">
+                <p className="font-semibold text-slate-900">
                   {issue.region} · {issue.note}
                 </p>
-                <span className="text-xs font-semibold text-slate-500">
-                  {issue.count}
-                </span>
+                <Badge variant="warning" size="sm">{issue.count}</Badge>
               </div>
             ))}
           </div>
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">
-            At-risk payments
-          </p>
-          <ul className="space-y-2 text-sm text-slate-600">
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-900">At-risk payments</h3>
+          <div className="space-y-3">
             {data.atRisk.map((item) => (
-              <li
+              <div
                 key={item.name}
-                className="flex items-center justify-between rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-rose-900"
+                className="flex items-center justify-between rounded-2xl border-2 border-rose-200 bg-rose-50 px-4 py-4 shadow-sm"
               >
-                <span>{item.name}</span>
-                <span className="font-semibold">{item.count}</span>
-              </li>
+                <span className="font-semibold text-rose-900">{item.name}</span>
+                <Badge variant="error" size="sm">{item.count}</Badge>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </Card>

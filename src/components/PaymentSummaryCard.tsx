@@ -1,4 +1,5 @@
 import Card from '@/components/Card';
+import StatCard from '@/components/ui/StatCard';
 import type { PaymentSummary } from '@/lib/types';
 
 type Props = {
@@ -6,44 +7,44 @@ type Props = {
 };
 
 export default function PaymentSummaryCard({ summary }: Props) {
-
   return (
-    <Card title="Payment Summary">
-      <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <SummaryStat label="Workers in run" value={summary.totalWorkers} />
-          <SummaryStat
-            label={`Total in ${summary.baseCurrency}`}
-            value={formatCurrency(
-              summary.totalBaseAmount,
-              summary.baseCurrency,
-            )}
+    <Card title="Payment Summary" variant="elevated">
+      <div className="space-y-8">
+        <div className="grid gap-6 sm:grid-cols-3">
+          <StatCard
+            label="Workers in run"
+            value={summary.totalWorkers}
+            className="border-slate-200"
           />
-          <SummaryStat
+          <StatCard
+            label={`Total in ${summary.baseCurrency}`}
+            value={formatCurrency(summary.totalBaseAmount, summary.baseCurrency)}
+            className="border-slate-200"
+          />
+          <StatCard
             label="Wise fee (est.)"
             value={formatCurrency(summary.wiseFee, summary.baseCurrency)}
+            className="border-slate-200"
           />
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">
-            FX breakdown
-          </p>
-          <div className="grid gap-3 md:grid-cols-2">
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-900">FX breakdown</h3>
+          <div className="grid gap-4 md:grid-cols-2">
             {summary.totalsByCurrency.map((item) => (
               <div
                 key={item.currency}
-                className="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-sm"
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold text-slate-800">
+                  <p className="text-base font-bold text-slate-900">
                     {item.currency}
                   </p>
-                  <p className="text-slate-600">
+                  <p className="text-lg font-semibold text-slate-700">
                     {formatCurrency(item.amount, item.currency)}
                   </p>
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="mt-2 text-sm text-slate-600">
                   {formatCurrency(item.amountInBase, summary.baseCurrency)} base
                 </p>
               </div>
@@ -51,33 +52,22 @@ export default function PaymentSummaryCard({ summary }: Props) {
           </div>
         </div>
 
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-600">
-            Settlement estimates
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-slate-900">Settlement estimates</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
             {summary.settlement.map((item) => (
               <div
                 key={item.currency}
-                className="rounded-lg border border-slate-100 bg-white px-3 py-2 text-sm"
+                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
               >
-                <p className="font-semibold text-slate-800">{item.currency}</p>
-                <p className="text-slate-500">{item.eta}</p>
+                <p className="text-base font-bold text-slate-900">{item.currency}</p>
+                <p className="mt-1 text-sm text-slate-600">{item.eta}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
     </Card>
-  );
-}
-
-function SummaryStat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-lg border border-slate-100 bg-slate-50 p-4">
-      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="text-xl font-semibold text-slate-900">{value}</p>
-    </div>
   );
 }
 

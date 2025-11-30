@@ -42,8 +42,8 @@ export default function SideNav({ links }: SideNavProps) {
               className={clsx(
                 'flex items-center gap-3 rounded-xl px-3 py-2 transition',
                 isActive
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100',
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700',
               )}
             >
               {link.icon && <span className="text-base">{link.icon}</span>}

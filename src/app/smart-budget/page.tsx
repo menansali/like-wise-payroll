@@ -10,6 +10,9 @@ import LockPriceModal from '@/components/smart-budget/LockPriceModal';
 import SavingsPopup from '@/components/smart-budget/SavingsPopup';
 import { smartBudgetSchedule } from '@/lib/mockData';
 import type { SmartBudgetScheduleRow } from '@/lib/types';
+import SectionHeader from '@/components/ui/SectionHeader';
+import AlertBanner from '@/components/ui/AlertBanner';
+import Card from '@/components/Card';
 
 export default function SmartBudgetPage() {
   const [budgetCreated, setBudgetCreated] = useState(false);
@@ -49,26 +52,33 @@ export default function SmartBudgetPage() {
     setSelectedRow(null);
   };
 
+  const handleSchedulePayout = (row: SmartBudgetScheduleRow) => {
+    // Mock: Show success message
+    setBudgetCreated(true);
+    setTimeout(() => setBudgetCreated(false), 3000);
+    // In production, this would schedule a payout for the selected currency
+  };
+
   const handleQuarterChange = (quarter: string) => {
     setSelectedQuarter(quarter);
     // Quarter filter changed - ready for API integration
     // In production, this would filter/load data for the selected quarter
+    // For demo, we'll just update the state - the schedule table can use this
   };
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Smart Budget</h1>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <CategoryFilterButton
-            label={selectedQuarter}
-            options={['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4']}
-            onChange={handleQuarterChange}
-          />
-        </div>
+      <div className="space-y-8">
+        <SectionHeader
+          title="Smart Budget"
+          actions={
+            <CategoryFilterButton
+              label={selectedQuarter}
+              options={['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4']}
+              onChange={handleQuarterChange}
+            />
+          }
+        />
 
         <div className="grid gap-6 lg:grid-cols-2">
           <BudgetOverviewCard
@@ -85,26 +95,32 @@ export default function SmartBudgetPage() {
         </div>
 
         {budgetCreated && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-            Budget created successfully! This would be saved in production.
-          </div>
+          <AlertBanner
+            message="Budget created successfully! This would be saved in production."
+            variant="success"
+            title="Success"
+          />
         )}
 
         {!savingsPopupOpen && (
-          <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
-            <p className="text-xs uppercase tracking-wide text-emerald-100">
+          <Card variant="default" className="!border-emerald-500 !bg-emerald-500 !text-white">
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">
               Converting alert
             </p>
-            <p className="mt-2 text-lg font-semibold text-white">
+            <p className="mt-3 text-xl font-bold text-white lg:text-2xl">
               Save 2% more. Convert USD → INR now.
             </p>
-            <p className="text-sm text-emerald-100">
+            <p className="mt-2 text-sm text-emerald-100">
               Lock today&apos;s rate to maximize savings on your next payroll run.
             </p>
-          </section>
+          </Card>
         )}
 
-        <ScheduleTable rows={smartBudgetSchedule} onLockClick={handleLockClick} />
+        <ScheduleTable 
+          rows={smartBudgetSchedule} 
+          onLockClick={handleLockClick}
+          onSchedulePayout={handleSchedulePayout}
+        />
       </div>
 
       {selectedRow && (

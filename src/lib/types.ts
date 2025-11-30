@@ -43,6 +43,7 @@ export type ExecutionResult = {
   successCount: number;
   failedCount: number;
   fxDecision?: string;
+  fxPlanDetails?: FxPlanDetails;
 };
 
 export type DashboardTopline = {
@@ -82,6 +83,27 @@ export type FxPlan = {
   indicativeRate: number;
   options: FxOption[];
 };
+
+export type FxPlanDetails = 
+  | {
+      type: 'convert_now';
+      rate: number;
+      timestamp: number;
+      convertedAmount: number;
+      fee: number;
+    }
+  | {
+      type: 'schedule';
+      payday: string;
+      strategy: 'auto-convert';
+      scheduledAt: number;
+    }
+  | {
+      type: 'rate_lock';
+      expiresAt: number;
+      lockedRate: number;
+      lockedAt: number;
+    };
 
 export type CurrencyNeed = {
   id: string;

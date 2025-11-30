@@ -1,35 +1,35 @@
 import Link from 'next/link';
 import Card from '@/components/Card';
+import Badge from '@/components/ui/Badge';
 import { dashboardShortcuts } from '@/lib/mockData';
 import type { DashboardShortcut } from '@/lib/types';
+import { ArrowRight } from 'lucide-react';
 
 export default function DashboardShortcuts() {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-6 md:grid-cols-2">
       {dashboardShortcuts.map((shortcut: DashboardShortcut) => (
         <Card
           key={shortcut.title}
-          className="flex flex-col justify-between"
+          variant="elevated"
+          className="group transition-all hover:shadow-lg"
           title={
-            <div className="flex items-center gap-2">
-              <span>{shortcut.title}</span>
-              {shortcut.tag && (
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
-                  {shortcut.tag}
-                </span>
-              )}
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold">{shortcut.title}</span>
+              {shortcut.tag && <Badge variant="default" size="sm">{shortcut.tag}</Badge>}
             </div>
           }
           actions={
             <Link
               href={shortcut.href}
-              className="text-sm font-semibold text-slate-900 underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 transition-colors hover:text-emerald-700"
             >
               Open
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
           }
         >
-          <p className="text-sm text-slate-500">{shortcut.description}</p>
+          <p className="text-base text-slate-600">{shortcut.description}</p>
         </Card>
       ))}
     </div>

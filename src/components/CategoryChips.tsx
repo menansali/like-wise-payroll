@@ -1,15 +1,28 @@
 'use client';
 
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { CategoryFilter } from '@/lib/types';
 
 type Props = {
   filters: CategoryFilter[];
+  onChange?: (filterId: string) => void;
+  defaultFilter?: string;
 };
 
-export default function CategoryChips({ filters }: Props) {
-  const [active, setActive] = useState(filters[0]?.id ?? '');
+export default function CategoryChips({ filters, onChange, defaultFilter }: Props) {
+  const [active, setActive] = useState(defaultFilter ?? filters[0]?.id ?? '');
+
+  useEffect(() => {
+    if (defaultFilter !== undefined) {
+      setActive(defaultFilter);
+    }
+  }, [defaultFilter]);
+
+  const handleClick = (filterId: string) => {
+    setActive(filterId);
+    onChange?.(filterId);
+  };
 
   return (
     <div className="flex flex-wrap gap-3">
@@ -17,12 +30,12 @@ export default function CategoryChips({ filters }: Props) {
         <button
           key={filter.id}
           type="button"
-          onClick={() => setActive(filter.id)}
+          onClick={() => handleClick(filter.id)}
           className={clsx(
             'rounded-full border px-4 py-1 text-sm font-semibold transition',
             active === filter.id
-              ? 'border-slate-900 bg-slate-900 text-white'
-              : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
+              ? 'border-emerald-600 bg-emerald-600 text-white'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-300 hover:text-emerald-700',
           )}
         >
           {filter.label}

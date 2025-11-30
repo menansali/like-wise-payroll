@@ -5,6 +5,9 @@ import Layout from '@/components/Layout';
 import PayrollUploadForm from '@/components/PayrollUploadForm';
 import ValidationTable from '@/components/ValidationTable';
 import { usePayrun } from '@/context/PayrunContext';
+import SectionHeader from '@/components/ui/SectionHeader';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 
 export default function PayrollUploadPage() {
   const router = useRouter();
@@ -17,55 +20,49 @@ export default function PayrollUploadPage() {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-slate-500">
-            Upload & validate
-          </p>
-          <h1 className="text-2xl font-semibold text-slate-900">
-            Payroll file validation
-          </h1>
-          <p className="text-sm text-slate-500">
-            Upload the CSV, review errors or warnings, then proceed to payment
-            summary.
-          </p>
-        </div>
+      <div className="space-y-8">
+        <SectionHeader
+          subtitle="Upload & validate"
+          title="Payroll file validation"
+          description="Upload the CSV, review errors or warnings, then proceed to payment summary."
+        />
 
         <PayrollUploadForm />
 
         {validationResult && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-3 text-sm text-slate-600">
-              <span className="rounded-full bg-rose-50 px-3 py-1 text-rose-700">
-                {errors.length} errors
-              </span>
-              <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700">
-                {warnings.length} warnings
-              </span>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="error" size="md">
+                {errors.length} {errors.length === 1 ? 'error' : 'errors'}
+              </Badge>
+              <Badge variant="warning" size="md">
+                {warnings.length} {warnings.length === 1 ? 'warning' : 'warnings'}
+              </Badge>
+              <Badge variant="success" size="md">
                 {valid.length} ready
-              </span>
+              </Badge>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <ValidationTable rows={errors} type="error" />
               <ValidationTable rows={warnings} type="warning" />
               <ValidationTable rows={valid} type="valid" />
             </div>
 
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={!canContinue}
-              onClick={() => router.push('/payroll/summary')}
-            >
-              Continue to Payment Summary
-            </button>
-            {!canContinue && (
-              <p className="text-xs text-slate-500">
-                Resolve all errors before continuing.
-              </p>
-            )}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
+                onClick={() => router.push('/payroll/summary')}
+                disabled={!canContinue}
+                size="lg"
+              >
+                Continue to Payment Summary
+              </Button>
+              {!canContinue && (
+                <p className="flex items-center text-sm text-slate-600">
+                  Resolve all errors before continuing.
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>

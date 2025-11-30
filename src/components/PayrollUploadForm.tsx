@@ -1,10 +1,14 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { usePayrun } from '@/context/PayrunContext';
 import { parseCsv } from '@/lib/csv';
 import { generateDemoPayrollRows } from '@/lib/generateDemoPayroll';
 import type { PayrollRow, ValidationResult } from '@/lib/types';
+import UploadZone from '@/components/ui/UploadZone';
+import Button from '@/components/ui/Button';
+import AlertBanner from '@/components/ui/AlertBanner';
+import CardShell from '@/components/ui/CardShell';
 
 type Props = {
   onComplete?: () => void;
@@ -12,23 +16,10 @@ type Props = {
 
 export default function PayrollUploadForm({ onComplete }: Props) {
   const { setValidationResult } = usePayrun();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const [isDemoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const handleFilePick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
-    setSelectedFile(file);
-    setFileName(file?.name ?? null);
-    setError(null);
-  };
 
   const runValidation = async (rows: PayrollRow[]) => {
     const response = await fetch('/api/validate', {
@@ -48,20 +39,13 @@ export default function PayrollUploadForm({ onComplete }: Props) {
     onComplete?.();
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleFileSelect = async (file: File | null) => {
+    setSelectedFile(file);
     setError(null);
 
-    const file = selectedFile;
-
-    if (!file) {
-      setError('Please select a CSV file.');
-      handleFilePick();
-      return;
-    }
+    if (!file) return;
 
     setSubmitting(true);
-
     try {
       const text = await file.text();
       const rows = parseCsv(text);
@@ -81,11 +65,9 @@ export default function PayrollUploadForm({ onComplete }: Props) {
     setError(null);
     setDemoLoading(true);
     setSelectedFile(null);
-    setFileName('demo-payroll.csv');
 
     try {
-      // Generate random demo data each time
-      const rowCount = Math.floor(Math.random() * 8) + 8; // Random between 8-15 employees
+      const rowCount = Math.floor(Math.random() * 8) + 8;
       const rows = generateDemoPayrollRows(rowCount);
       await runValidation(rows);
     } catch (demoError) {
@@ -98,62 +80,33 @@ export default function PayrollUploadForm({ onComplete }: Props) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-3 rounded-xl border border-dashed border-slate-300 bg-white p-6"
-    >
-      <div>
-        <label className="text-sm font-medium text-slate-700">
-          Upload payroll CSV
-        </label>
-        <p className="text-xs text-slate-500">
-          Columns: employeeId, name, country, currency, amount, bankAccount
-        </p>
-      </div>
-
-      <input
-        ref={fileInputRef}
+    <CardShell>
+      <UploadZone
         accept=".csv"
-        type="file"
-        name="payroll-file"
-        className="hidden"
-        onChange={handleFileChange}
+        onFileSelect={handleFileSelect}
+        selectedFile={selectedFile}
+        isLoading={isSubmitting}
+        label="Upload payroll CSV"
+        description="Columns: employeeId, name, country, currency, amount, bankAccount"
       />
 
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={handleFilePick}
-          className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400"
-        >
-          {fileName ? 'Choose another file' : 'Select CSV'}
-        </button>
-        <button
-          type="button"
+      <div className="mt-6 flex items-center gap-3">
+        <Button
+          variant="secondary"
           onClick={handleDemoUpload}
-          className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-300"
-          disabled={isDemoLoading}
+          isLoading={isDemoLoading}
+          disabled={isSubmitting}
         >
-          {isDemoLoading ? 'Loading…' : 'Use demo file'}
-        </button>
-        {fileName && (
-          <p className="text-sm text-slate-600">
-            Selected: <span className="font-medium">{fileName}</span>
-          </p>
-        )}
+          Use demo file
+        </Button>
       </div>
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
-
-      <button
-        type="submit"
-        className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={isSubmitting || !selectedFile}
-      >
-        {isSubmitting ? 'Validating…' : 'Upload & validate'}
-      </button>
-
-    </form>
+      {error && (
+        <div className="mt-6">
+          <AlertBanner message={error} variant="error" />
+        </div>
+      )}
+    </CardShell>
   );
 }
 

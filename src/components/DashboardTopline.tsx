@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import StatCard from '@/components/ui/StatCard';
 import Card from '@/components/Card';
 import { dashboardTopline } from '@/lib/mockData';
 import type { DashboardTopline as DashboardToplineType } from '@/lib/types';
@@ -28,7 +29,7 @@ export default function DashboardTopline() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
           <Card key={i}>
             <div className="animate-pulse space-y-3">
@@ -43,40 +44,28 @@ export default function DashboardTopline() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
-      <Card>
-        <p className="text-xs uppercase tracking-wide text-slate-500">
-          {data.cycleLabel}
-        </p>
-        <p className="mt-2 text-2xl font-semibold text-slate-900">
-          {data.cycleCountdown}
-        </p>
-        <p className="text-sm text-slate-500">
-          Includes onboarding and approval buffers.
-        </p>
-      </Card>
-      <Card>
-        <p className="text-xs uppercase tracking-wide text-slate-500">
-          Funds needed this month
-        </p>
-        <p className="mt-2 text-2xl font-semibold text-slate-900">
-          {formatCurrency(data.totalFunds, data.currency)}
-        </p>
-        <p className="text-sm text-slate-500">
-          Includes 12 countries / 3 currencies.
-        </p>
-      </Card>
-      <section className="rounded-xl border border-emerald-600 bg-emerald-600 p-6 text-emerald-50 shadow-sm">
-        <p className="text-xs uppercase tracking-wide text-emerald-100">
+    <div className="grid gap-6 lg:grid-cols-3">
+      <StatCard
+        label={data.cycleLabel}
+        value={data.cycleCountdown}
+        description="Includes onboarding and approval buffers."
+      />
+      <StatCard
+        label="Funds needed this month"
+        value={formatCurrency(data.totalFunds, data.currency)}
+        description="Includes 12 countries / 3 currencies."
+      />
+      <Card variant="default" className="!border-emerald-500 !bg-emerald-500 !text-white">
+        <p className="text-xs font-semibold uppercase tracking-wide text-emerald-100">
           {data.smartAlert.title}
         </p>
-        <p className="mt-2 text-lg font-semibold text-white">
+        <p className="mt-3 text-xl font-bold text-white lg:text-2xl">
           {data.smartAlert.message}
         </p>
-        <p className="text-sm text-emerald-100">
+        <p className="mt-2 text-sm text-emerald-100">
           Save approximately {data.smartAlert.savingsPercent}% vs. last FX trade.
         </p>
-      </section>
+      </Card>
     </div>
   );
 }
