@@ -56,20 +56,23 @@ LikeWise provides:
 - Quarterly budget tracking
 
 ### 3. **Intelligent FX Management**
-- Real-time exchange rate tracking
-- Three FX strategy options:
-  - **Convert now** - Immediate conversion at current rates
-  - **Lock rate** - Reserve rate for future conversion
-  - **Convert on payroll date** - Market rate at execution
+- Real-time exchange rate tracking with mock API
+- **FX Planner** with three fully functional strategy options:
+  - **Convert Now** - Immediately locks current rate, converts funds, and shows conversion details
+  - **Schedule for Payday** - Automatically converts on payroll cut-off date
+  - **Lock Rate for 24h** - Holds today's rate for 24 hours with live countdown timer
 - Rate comparison and savings calculations
+- Loading states and success feedback for all FX actions
+- Detailed plan information displayed on confirmation page
 - Multi-currency support (GBP, USD, HKD, KES, ARS, and more)
 
 ### 4. **Comprehensive Dashboard**
 - Workforce snapshot with employee overview
 - Payroll cycle health monitoring
 - Smart alerts with actionable insights
-- Currency needs tracking
+- Currency needs tracking with filtering
 - Team member management
+- **Notification system** with unread count badges and mark-as-read functionality
 
 ### 5. **Employee Management**
 - Detailed employee profiles
@@ -82,11 +85,12 @@ LikeWise provides:
 
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS 4
-- **UI Components**: Custom components with Lucide React icons
-- **State Management**: React Context API
+- **Styling**: Tailwind CSS 4 with custom design system
+- **UI Components**: Modern, reusable component library with Lucide React icons
+- **State Management**: React Context API with localStorage persistence
 - **Validation**: Custom validation engine
 - **CSV Processing**: Client-side parsing
+- **Design System**: Wise-inspired color palette, spacing scale, and typography
 
 ### Development Tools
 
@@ -118,16 +122,20 @@ Summary → FX Planning → Execute → Confirmation
 3. **Payment Summary** (`/payroll/summary`)
    - Review totals by currency and country
    - See Wise fees and settlement times
-   - Choose FX strategy:
-     - Convert now
-     - Lock rate
-     - Convert on payroll date
-   - Execute payroll
+   - **FX Planner** - Choose one of three FX strategies:
+     - **Convert Now** - Locks rate immediately, shows conversion details
+     - **Schedule for Payday** - Schedules automatic conversion on payroll date
+     - **Lock Rate for 24h** - Holds rate for 24 hours with countdown timer
+   - Real-time loading states and success feedback
+   - Execute payroll with selected FX plan
 
 4. **Confirmation** (`/payroll/confirmation`)
    - View execution results
    - See success/failure counts
-   - Review FX decision applied
+   - Review detailed FX plan information:
+     - Conversion details (rate, amount, fee, timestamp) for Convert Now
+     - Schedule information (payday, strategy, scheduled time) for Schedule
+     - Lock details (rate, expiration, active status) for Lock Rate
 
 ### Secondary Flow: Smart Budget Planning
 
@@ -203,6 +211,7 @@ src/
 │   │   ├── dashboard/     # Dashboard data
 │   │   ├── execute/       # Payroll execution
 │   │   ├── fx-rates/      # FX rate data
+│   │   ├── fx-plan/       # FX plan actions (convert, schedule, lock)
 │   │   ├── validate/      # CSV validation
 │   │   └── ...
 │   ├── dashboard/         # Main dashboard page
@@ -214,11 +223,12 @@ src/
 │   ├── team/              # Team management
 │   └── ...
 ├── components/            # React components
+│   ├── ui/                # Reusable UI components (Button, Card, Badge, etc.)
 │   ├── dashboard/         # Dashboard widgets
 │   ├── payroll/           # Payroll components
 │   ├── smart-budget/      # Budget components
 │   ├── employees/         # Employee components
-│   └── navigation/        # Navigation components
+│   └── navigation/        # Navigation components (TopBar, SideNav, Notifications)
 ├── context/               # React Context providers
 │   └── PayrunContext.tsx  # Payroll run state management
 └── lib/                   # Utility functions
@@ -238,6 +248,7 @@ The platform is architected for easy integration with Wise APIs. Currently using
 
 - **Payroll Execution**: `/api/execute` - Ready for Wise Transfer API
 - **FX Rates**: `/api/fx-rates` - Ready for Wise Exchange Rate API
+- **FX Plan Actions**: `/api/fx-plan` - Ready for Wise FX locking/conversion APIs
 - **Validation**: `/api/validate` - Can be enhanced with Wise validation rules
 - **Dashboard Data**: `/api/dashboard` - Ready for Wise Account API
 
@@ -274,17 +285,28 @@ Three-tier validation system:
 
 ### FX Planning Options
 
+The FX Planner provides three fully functional options with mock API integration:
+
 1. **Convert Now**
-   - Immediate conversion at current market rate
+   - Immediately fetches and locks current market rate
+   - Converts funds with calculated fees
+   - Shows conversion details (rate, amount, fee, timestamp)
    - Best for: Stable currencies, immediate needs
+   - **Implementation**: Mock API with 800-1200ms delay, rate variation, fee calculation
 
-2. **Lock Rate**
-   - Reserve current rate for future conversion
-   - Best for: Volatile currencies, budget planning
+2. **Schedule for Payday**
+   - Schedules automatic conversion on payroll cut-off date
+   - No rate locked immediately
+   - Shows confirmation with payday and strategy
+   - Best for: Planned payroll cycles, automated execution
+   - **Implementation**: Stores schedule data, ready for cron/webhook integration
 
-3. **Convert on Payroll Date**
-   - Use market rate at execution time
-   - Best for: Flexible timing, market following
+3. **Lock Rate for 24h**
+   - Locks current rate for 24 hours
+   - Shows live countdown timer (hours and minutes)
+   - Displays expiration time and active status
+   - Best for: Volatile currencies, pending approvals
+   - **Implementation**: Mock API locks rate, calculates expiration, tracks status
 
 ### Smart Alerts
 
@@ -304,41 +326,33 @@ Supported currencies include:
 - ARS (Argentine Peso)
 - And more...
 
-## 🎬 Demo Guide
-
-### Quick Demo Path (2-3 minutes)
-
-1. **Dashboard Overview** (30s)
-   - Show workforce snapshot
-   - Highlight smart alerts
-   - Display currency needs
-
-2. **Payroll Flow** (1.5 min)
-   - Upload demo CSV
-   - Show validation results
-   - Select FX option
-   - Execute and confirm
-
-3. **Smart Budget** (1 min)
-   - Create budget
-   - Show rate locking modal
-   - Display savings alert
 
 ### Key Talking Points
 
 - "End-to-end payroll orchestration with multi-currency support"
+- "Fully functional FX Planner with three strategic options (Convert Now, Schedule, Lock Rate)"
 - "Smart FX rate locking saves 2%+ on volatile currencies"
+- "Modern, Wise-inspired UI with professional design system"
 - "Production-ready architecture, ready for Wise API integration"
 - "Built with Next.js 16, TypeScript, fully responsive"
 - "Complete validation pipeline with 3-tier error handling"
+- "All interactive elements functional with loading states and error handling"
 
 ## 🎨 Design & Branding
 
-- **Color Scheme**: Wise green theme (#00B9FF variations)
-- **Typography**: Clean, modern sans-serif
+- **Color Scheme**: Wise-inspired emerald green theme with consistent accent colors
+- **Typography**: Clean, modern sans-serif with large readable headers
 - **Icons**: Lucide React icon library
-- **Layout**: Responsive grid system
-- **Components**: Reusable, accessible components
+- **Layout**: Responsive grid system with consistent spacing (16/24/32/48px scale)
+- **Components**: Modern, reusable component library with:
+  - Consistent card designs (rounded corners, soft shadows)
+  - Unified button variants (primary, secondary, ghost, danger)
+  - Alert banners (success, warning, error, info)
+  - Data tables with zebra rows
+  - Upload zones with drag-and-drop
+  - Stat cards and badges
+- **Micro-interactions**: Smooth transitions, hover effects, loading states
+- **Accessibility**: Proper focus states, ARIA labels, keyboard navigation
 
 ## 🔒 Security Considerations
 
@@ -349,6 +363,18 @@ For production deployment:
 - Add audit logging
 - Implement rate limiting
 - Add CSRF protection
+
+## ✨ Recent Improvements
+
+- ✅ **UI Modernization**: Complete redesign with Wise-style aesthetic
+- ✅ **FX Planner**: Fully functional with all three options (Convert Now, Schedule, Lock Rate)
+- ✅ **Interactive Elements**: All buttons, links, and actions are fully functional
+- ✅ **Notification System**: Dropdown with unread badges and mark-as-read functionality
+- ✅ **Design System**: Consistent spacing, typography, and color palette
+- ✅ **Component Library**: Reusable UI components (Button, Card, Badge, AlertBanner, etc.)
+- ✅ **Loading States**: Professional loading indicators for all async operations
+- ✅ **Error Handling**: Comprehensive error messages and fallback states
+- ✅ **State Persistence**: Payroll run state persists across page navigation
 
 ## 🚧 Future Enhancements
 
